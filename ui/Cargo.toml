@@ -1,0 +1,50 @@
+[package]
+name = "vectorize-ui"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vectorize-shared = { path = "../shared" }
+
+# Leptos framework
+leptos = { workspace = true }
+leptos_router = { workspace = true }
+leptos_meta = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# IDs
+uuid = { workspace = true }
+
+# WASM bindings
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true }
+js-sys = { workspace = true }
+
+# Browser APIs
+gloo-net = { workspace = true }
+gloo-timers = { workspace = true }
+gloo-storage = { workspace = true }
+
+# Async
+futures = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-wasm = "0.2"
+
+# Error handling  
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[lib]
+crate-type = ["cdylib", "rlib"]

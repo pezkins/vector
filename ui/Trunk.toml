@@ -1,0 +1,20 @@
+# Trunk configuration for Leptos WASM builds
+# https://trunkrs.dev/configuration/
+
+[build]
+# Build target
+target = "index.html"
+# Output directory
+dist = "dist"
+
+[watch]
+# Watch these directories for changes
+watch = ["src", "index.html"]
+
+[serve]
+# Development server address
+address = "127.0.0.1"
+# Development server port
+port = 8080
+# Open browser on serve
+open = true

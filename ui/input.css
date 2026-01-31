@@ -1,0 +1,134 @@
+/* TailwindCSS imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component styles */
+@layer components {
+    /* Button variants */
+    .btn {
+        @apply px-4 py-2 rounded-lg font-medium transition-colors duration-150;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
+    }
+    
+    .btn-primary {
+        @apply btn bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500;
+    }
+    
+    .btn-secondary {
+        @apply btn bg-slate-700 hover:bg-slate-600 text-white focus:ring-slate-500;
+    }
+    
+    .btn-danger {
+        @apply btn bg-red-600 hover:bg-red-700 text-white focus:ring-red-500;
+    }
+    
+    .btn-ghost {
+        @apply btn bg-transparent hover:bg-slate-800 text-slate-300 focus:ring-slate-500;
+    }
+    
+    /* Input fields */
+    .input {
+        @apply w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg;
+        @apply text-slate-100 placeholder-slate-500;
+        @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        @apply transition-colors duration-150;
+    }
+    
+    .input-label {
+        @apply block text-sm font-medium text-slate-400 mb-1;
+    }
+    
+    /* Cards */
+    .card {
+        @apply bg-slate-800 border border-slate-700 rounded-xl p-4;
+    }
+    
+    /* Pipeline nodes */
+    .pipeline-node {
+        @apply flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer;
+        @apply border-2 border-transparent transition-all duration-150;
+        @apply hover:shadow-lg;
+    }
+    
+    .pipeline-node.source {
+        @apply bg-violet-900/50 hover:bg-violet-900/70 hover:border-violet-500;
+    }
+    
+    .pipeline-node.transform {
+        @apply bg-cyan-900/50 hover:bg-cyan-900/70 hover:border-cyan-500;
+    }
+    
+    .pipeline-node.sink {
+        @apply bg-orange-900/50 hover:bg-orange-900/70 hover:border-orange-500;
+    }
+    
+    .pipeline-node.selected {
+        @apply ring-2 ring-blue-500;
+    }
+    
+    /* Status indicators */
+    .status-dot {
+        @apply w-2 h-2 rounded-full;
+    }
+    
+    .status-dot.healthy {
+        @apply bg-green-500;
+    }
+    
+    .status-dot.degraded {
+        @apply bg-amber-500;
+    }
+    
+    .status-dot.unhealthy {
+        @apply bg-red-500;
+    }
+    
+    .status-dot.unknown {
+        @apply bg-slate-500;
+    }
+    
+    /* Scrollbar styling */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: theme('colors.slate.700') transparent;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: theme('colors.slate.700');
+        border-radius: 4px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: theme('colors.slate.600');
+    }
+}
+
+/* Animation utilities */
+@layer utilities {
+    .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-flow {
+        animation: flow 2s linear infinite;
+    }
+}
+
+@keyframes flow {
+    0% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -20;
+    }
+}

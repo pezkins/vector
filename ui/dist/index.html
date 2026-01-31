@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vectorize - Visual Pipeline Builder for Vector">
+    <title>Vectorize</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    
+    <!-- TailwindCSS output -->
+    <link rel="stylesheet" href="/output-41fc3386d087df00.css" integrity="sha384-7vXz/gsZnkL7iReZpaQDPcBIuZZwM23m/JvN3VJj0o3rl4dWuPam8RwqVHm/9qX2"/>
+    
+    <!-- WASM module -->
+    
+<script type="module">
+import init, * as bindings from '/vectorize-ui-c6a989bb3805c13.js';
+const wasm = await init({ module_or_path: '/vectorize-ui-c6a989bb3805c13_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+<link rel="modulepreload" href="/vectorize-ui-c6a989bb3805c13.js" crossorigin="anonymous" integrity="sha384-Q/3luW7i9DN/FVKaZvlCs9H96f2x9hMlIDIwGyM5VfduAv4xl3JiQyz6GhwnKtYx"><link rel="preload" href="/vectorize-ui-c6a989bb3805c13_bg.wasm" crossorigin="anonymous" integrity="sha384-325ElJSZXPU6eWCgw4lryLW4r1ieT6IggE2eiOC0Uyzots0EqrDrW15awvEp8cic" as="fetch" type="application/wasm"></head>
+<body class="bg-slate-900 text-slate-50 antialiased">
+    <!-- App will be mounted here by Leptos -->
+    <noscript>
+        <div class="min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-2xl font-bold mb-4">JavaScript Required</h1>
+                <p class="text-slate-400">
+                    Vectorize requires JavaScript to run. Please enable JavaScript in your browser.
+                </p>
+            </div>
+        </div>
+    </noscript>
+</body>
+</html>
