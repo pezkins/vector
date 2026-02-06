@@ -7,22 +7,67 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Custom Vectorize color palette
+        // Theme-aware colors using CSS variables
+        'theme': {
+          'bg': 'var(--color-bg)',
+          'surface': 'var(--color-surface)',
+          'surface-hover': 'var(--color-surface-hover)',
+          'border': 'var(--color-border)',
+          'text': 'var(--color-text)',
+          'text-secondary': 'var(--color-text-secondary)',
+          'muted': 'var(--color-muted)',
+        },
+        // Accent colors (same in both themes)
+        'accent': {
+          'DEFAULT': 'var(--color-accent)',
+          'hover': 'var(--color-accent-hover)',
+        },
+        'success': 'var(--color-success)',
+        'warning': 'var(--color-warning)',
+        'error': 'var(--color-error)',
+        // Component type colors
+        'source': 'var(--color-source)',
+        'transform': 'var(--color-transform)',
+        'sink': 'var(--color-sink)',
+        // Legacy vectorize namespace (for backward compatibility)
         'vectorize': {
-          'bg': '#0f172a',        // slate-900
-          'surface': '#1e293b',   // slate-800
-          'border': '#334155',    // slate-700
-          'text': '#f8fafc',      // slate-50
-          'muted': '#94a3b8',     // slate-400
-          'accent': '#3b82f6',    // blue-500
-          'success': '#22c55e',   // green-500
-          'warning': '#f59e0b',   // amber-500
-          'error': '#ef4444',     // red-500
-          // Component type colors
-          'source': '#8b5cf6',    // violet-500
-          'transform': '#06b6d4', // cyan-500
-          'sink': '#f97316',      // orange-500
+          'bg': 'var(--color-bg)',
+          'surface': 'var(--color-surface)',
+          'border': 'var(--color-border)',
+          'text': 'var(--color-text)',
+          'muted': 'var(--color-text-secondary)',
+          'accent': 'var(--color-accent)',
+          'success': 'var(--color-success)',
+          'warning': 'var(--color-warning)',
+          'error': 'var(--color-error)',
+          'source': 'var(--color-source)',
+          'transform': 'var(--color-transform)',
+          'sink': 'var(--color-sink)',
         }
+      },
+      backgroundColor: {
+        'theme': {
+          'bg': 'var(--color-bg)',
+          'surface': 'var(--color-surface)',
+          'surface-hover': 'var(--color-surface-hover)',
+        },
+      },
+      borderColor: {
+        'theme': {
+          'DEFAULT': 'var(--color-border)',
+          'border': 'var(--color-border)',
+        },
+      },
+      textColor: {
+        'theme': {
+          'DEFAULT': 'var(--color-text)',
+          'text': 'var(--color-text)',
+          'secondary': 'var(--color-text-secondary)',
+          'muted': 'var(--color-muted)',
+        },
+      },
+      ringOffsetColor: {
+        'theme': 'var(--color-bg)',
       },
       fontFamily: {
         'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],

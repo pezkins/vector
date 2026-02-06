@@ -38,7 +38,7 @@ pub struct VectorNode {
     pub url: String,
     
     /// Node health status
-    pub status: NodeStatus,
+    pub status: NodeHealthStatus,
     
     /// Last health check time
     pub last_seen: Option<DateTime<Utc>>,
@@ -47,10 +47,10 @@ pub struct VectorNode {
     pub version: Option<String>,
 }
 
-/// Node health status
+/// Node health status (for multi-node management)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum NodeStatus {
+pub enum NodeHealthStatus {
     /// Node is healthy and responsive
     Healthy,
     /// Node is degraded but operational
@@ -61,7 +61,7 @@ pub enum NodeStatus {
     Unknown,
 }
 
-impl Default for NodeStatus {
+impl Default for NodeHealthStatus {
     fn default() -> Self {
         Self::Unknown
     }

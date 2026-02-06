@@ -56,7 +56,7 @@ impl PipelineConfig {
 }
 
 /// Source component configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SourceConfig {
     /// Source type (e.g., "file", "http", "kafka")
     #[serde(rename = "type")]
@@ -82,7 +82,7 @@ impl SourceConfig {
 }
 
 /// Transform component configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TransformConfig {
     /// Transform type (e.g., "remap", "filter", "route")
     #[serde(rename = "type")]
@@ -112,7 +112,7 @@ impl TransformConfig {
 }
 
 /// Sink component configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SinkConfig {
     /// Sink type (e.g., "console", "file", "http", "kafka")
     #[serde(rename = "type")]
@@ -142,14 +142,14 @@ impl SinkConfig {
 }
 
 /// Node position in the pipeline canvas UI
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
 }
 
 /// A pipeline node with UI metadata
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PipelineNode {
     /// Unique node identifier
     pub id: String,
@@ -181,7 +181,7 @@ impl PipelineNode {
 }
 
 /// Type of pipeline node
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "category", content = "config")]
 pub enum NodeType {
     Source(SourceConfig),
@@ -210,22 +210,86 @@ impl NodeType {
 }
 
 /// A connection between pipeline nodes
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Connection {
-    /// Source node ID (with optional output port)
-    pub from: String,
+    /// Unique connection identifier
+    pub id: String,
+    
+    /// Source node ID
+    pub from_node: String,
     
     /// Target node ID
-    pub to: String,
+    pub to_node: String,
+    
+    /// Output port name (optional, for multi-output nodes like route)
+    #[serde(default)]
+    pub from_port: Option<String>,
+    
+    /// Input port index (usually 0 for single input)
+    #[serde(default)]
+    pub to_port: u32,
 }
 
 impl Connection {
-    pub fn new(from: impl Into<String>, to: impl Into<String>) -> Self {
+    pub fn new(from_node: impl Into<String>, to_node: impl Into<String>) -> Self {
         Self {
-            from: from.into(),
-            to: to.into(),
+            id: Uuid::new_v4().to_string(),
+            from_node: from_node.into(),
+            to_node: to_node.into(),
+            from_port: None,
+            to_port: 0,
         }
     }
+    
+    pub fn with_ports(mut self, from_port: Option<String>, to_port: u32) -> Self {
+        self.from_port = from_port;
+        self.to_port = to_port;
+        self
+    }
+}
+
+/// Node execution status for visualization
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum NodeStatus {
+    #[default]
+    Idle,
+    Running,
+    Success,
+    Error,
+    Warning,
+}
+
+/// Event data captured at a node
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct NodeEvent {
+    /// Timestamp of the event
+    pub timestamp: String,
+    
+    /// Event data as JSON
+    pub data: serde_json::Value,
+    
+    /// Size in bytes
+    #[serde(default)]
+    pub size_bytes: u64,
+}
+
+/// Node metrics for display
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct NodeMetrics {
+    /// Events processed
+    pub events_in: u64,
+    
+    /// Events output
+    pub events_out: u64,
+    
+    /// Bytes processed
+    pub bytes_in: u64,
+    
+    /// Bytes output
+    pub bytes_out: u64,
+    
+    /// Errors encountered
+    pub errors: u64,
 }
 
 /// Complete pipeline state including UI metadata
@@ -251,12 +315,55 @@ impl Pipeline {
     /// Remove a node and its connections
     pub fn remove_node(&mut self, id: &str) {
         self.nodes.remove(id);
-        self.connections.retain(|c| c.from != id && c.to != id);
+        self.connections.retain(|c| c.from_node != id && c.to_node != id);
     }
     
     /// Add a connection between nodes
-    pub fn connect(&mut self, from: impl Into<String>, to: impl Into<String>) {
-        self.connections.push(Connection::new(from, to));
+    pub fn connect(&mut self, from: impl Into<String>, to: impl Into<String>) -> String {
+        let conn = Connection::new(from, to);
+        let id = conn.id.clone();
+        self.connections.push(conn);
+        id
+    }
+    
+    /// Remove a connection by ID
+    pub fn disconnect(&mut self, connection_id: &str) {
+        self.connections.retain(|c| c.id != connection_id);
+    }
+    
+    /// Check if a connection exists between two nodes
+    pub fn has_connection(&self, from: &str, to: &str) -> bool {
+        self.connections.iter().any(|c| c.from_node == from && c.to_node == to)
+    }
+    
+    /// Get all connections from a node
+    pub fn connections_from(&self, node_id: &str) -> Vec<&Connection> {
+        self.connections.iter().filter(|c| c.from_node == node_id).collect()
+    }
+    
+    /// Get all connections to a node
+    pub fn connections_to(&self, node_id: &str) -> Vec<&Connection> {
+        self.connections.iter().filter(|c| c.to_node == node_id).collect()
+    }
+    
+    /// Get the input component names for a given node
+    /// Returns the names of upstream nodes (used as component IDs in Vector config)
+    pub fn get_inputs(&self, node_id: &str) -> Vec<String> {
+        self.connections
+            .iter()
+            .filter(|c| c.to_node == node_id)
+            .filter_map(|c| {
+                // Get the upstream node and return its name (component ID)
+                self.nodes.get(&c.from_node).map(|node| node.name.clone())
+            })
+            .collect()
+    }
+    
+    /// Update node position
+    pub fn update_node_position(&mut self, node_id: &str, x: f64, y: f64) {
+        if let Some(node) = self.nodes.get_mut(node_id) {
+            node.position = Position { x, y };
+        }
     }
     
     /// Convert to Vector pipeline configuration
@@ -264,15 +371,24 @@ impl Pipeline {
         let mut config = PipelineConfig::new();
         
         for (id, node) in &self.nodes {
+            // Use node.name as the component ID (what Vector uses)
+            let component_id = &node.name;
+            
             match &node.node_type {
                 NodeType::Source(source) => {
-                    config.add_source(id, source.clone());
+                    config.add_source(component_id, source.clone());
                 }
                 NodeType::Transform(transform) => {
-                    config.add_transform(id, transform.clone());
+                    // Clone and update inputs based on connections
+                    let mut transform = transform.clone();
+                    transform.inputs = self.get_inputs(id);
+                    config.add_transform(component_id, transform);
                 }
                 NodeType::Sink(sink) => {
-                    config.add_sink(id, sink.clone());
+                    // Clone and update inputs based on connections
+                    let mut sink = sink.clone();
+                    sink.inputs = self.get_inputs(id);
+                    config.add_sink(component_id, sink);
                 }
             }
         }

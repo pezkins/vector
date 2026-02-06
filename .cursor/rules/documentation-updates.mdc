@@ -1,0 +1,66 @@
+---
+description: Ensures documentation stays current after development work. Apply after completing features, fixing bugs, or making significant changes.
+alwaysApply: true
+---
+
+# Documentation Updates
+
+After completing any significant development work, update the following documentation:
+
+## Required Updates Checklist
+
+### 1. Update `.cursor/PLAN.md`
+- [ ] Update "Current Status" section with completed items
+- [ ] Move completed tasks from "In Progress" to "Completed"
+- [ ] Add any new "Known Issues" discovered
+- [ ] Update "Notes for Next Session" if relevant
+
+### 2. Update Skills if Implementation Changed
+- [ ] `.cursor/skills/vectorize-project/SKILL.md` - if architecture or build process changed
+- [ ] `.cursor/skills/vectorize-live-data/SKILL.md` - if data streaming approach changed
+- [ ] Create new skills for major new features
+
+### 3. Update Subagents if Domain Knowledge Changed
+- [ ] `.cursor/agents/*.md` - update if APIs, patterns, or processes changed
+- [ ] Add new subagents for new specialized domains
+
+### 4. Update README if User-Facing Changes
+- [ ] `VECTORIZE_README.md` - update if CLI options, setup, or features changed
+
+## When to Apply
+
+**Always update after:**
+- Completing a feature or major task
+- Fixing significant bugs
+- Changing architecture or APIs
+- Adding new components or modules
+- Modifying build process
+
+**Skip for:**
+- Minor refactoring with no behavior change
+- Small bug fixes
+- Code style changes
+
+## Example Update
+
+After implementing live data streaming:
+
+```markdown
+# In PLAN.md, move from "In Progress" to "Completed":
+- [x] **Implement live data streaming**: GraphQL subscriptions working
+
+# In skills/vectorize-live-data/SKILL.md, update:
+- Change "needs to be implemented" to "implemented in ui/src/client/subscription.rs"
+- Add actual code patterns used
+
+# In agents/data-streaming.md, update:
+- Remove implementation checklist (done)
+- Add troubleshooting for common issues encountered
+```
+
+## Reminder
+
+Before ending a development session, ask yourself:
+> "Would a new agent starting tomorrow know what changed and how to continue?"
+
+If not, update the docs.

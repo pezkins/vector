@@ -1,0 +1,57 @@
+# Vectorize Agent + Vector Combined Image
+# This image runs both Vector and the Vectorize agent sidecar
+
+FROM timberio/vector:0.44.0-alpine AS vector
+
+FROM rust:1.75-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig git
+
+# Copy and build vectorize
+WORKDIR /build
+COPY . .
+
+# Build the vectorize binary (release mode, static linking)
+RUN OPENSSL_STATIC=1 cargo build --release -p vectorize --target-dir /build/target
+
+# Final image
+FROM alpine:3.19
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata \
+    bash \
+    curl \
+    supervisor
+
+# Copy Vector from the official image
+COPY --from=vector /usr/local/bin/vector /usr/local/bin/vector
+
+# Copy Vectorize agent
+COPY --from=builder /build/target/release/vectorize /usr/local/bin/vectorize
+
+# Create directories
+RUN mkdir -p /etc/vector /var/lib/vector /var/log/supervisor
+
+# Copy supervisord config to run both processes
+COPY dev/supervisord.conf /etc/supervisord.conf
+
+# Default environment variables
+ENV VECTOR_API_ENABLED=true \
+    VECTOR_API_ADDRESS=0.0.0.0:8686 \
+    VECTOR_LOG=info \
+    VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080 \
+    VECTORIZE_AGENT_NAME=agent \
+    VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+
+# Expose Vector API port
+EXPOSE 8686
+
+# Health check
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+    CMD wget -q --spider http://localhost:8686/health || exit 1
+
+# Run supervisor to manage both processes
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

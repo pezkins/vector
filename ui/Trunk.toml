@@ -12,8 +12,8 @@ dist = "dist"
 watch = ["src", "index.html"]
 
 [serve]
-# Development server address
-address = "127.0.0.1"
+# Development server addresses (supports multiple)
+addresses = ["127.0.0.1"]
 # Development server port
 port = 8080
 # Open browser on serve

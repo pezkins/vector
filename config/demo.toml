@@ -1,0 +1,27 @@
+# Vectorize Pipeline Configuration
+# Auto-generated - do not edit manually
+
+[api]
+enabled = true
+address = "127.0.0.1:8686"
+playground = true
+
+[sources.demo_logs]
+format = "syslog"
+type = "demo_logs"
+
+[transforms]
+
+[transforms.filter]
+condition = '''
+contains(string!(.message), ">")
+
+'''
+inputs = ["demo_logs"]
+type = "filter"
+
+[sinks.console]
+encoding.codec = "json"
+inputs = ["filter"]
+type = "console"
+

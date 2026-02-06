@@ -1,14 +1,23 @@
 //! UI Components
 //!
 //! This module contains all UI components organized by feature:
+//! - `layout`: Core layout components (AppShell, Sidebar, TopBar, BottomPanel)
+//! - `dashboard`: Main dashboard overview
+//! - `fleet`: Agent and topology management
 //! - `pipeline`: Pipeline builder components
-//! - `data_view`: Live data visualization
-//! - `nodes`: Node management (multi-node mode)
-//! - `config`: Configuration editors
-//! - `common`: Shared/reusable components
+//! - `management`: Control plane management (groups, deployments)
+//! - `observe`: Metrics, alerts, and audit logs
+//! - `settings`: User and system settings
+//! - `tap`: Live data sampling/tap viewer
+//! - `common`: Shared/reusable components (legacy, being migrated to layout)
+//! - `setup`: First-time setup wizard
 
+pub mod layout;
 pub mod common;
+pub mod dashboard;
+pub mod management;
+pub mod observe;
 pub mod pipeline;
-// pub mod data_view;  // TODO: Implement
-// pub mod nodes;      // TODO: Implement
-// pub mod config;     // TODO: Implement
+pub mod settings;
+pub mod setup;
+pub mod tap;

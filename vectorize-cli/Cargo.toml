@@ -3,10 +3,14 @@ name = "vectorize"
 version = "0.1.0"
 edition = "2021"
 description = "Visual Pipeline Builder for Vector - A unified observability tool"
-license = "MIT OR Apache-2.0"
+license = "Proprietary"
 authors = ["Vectorize Team"]
-repository = "https://github.com/pezkins/vector"
+repository = "https://github.com/pezkins/vectorize"
 default-run = "vectorize"
+
+[lib]
+name = "vectorize"
+path = "src/lib.rs"
 
 [[bin]]
 name = "vectorize"
@@ -49,3 +53,42 @@ reqwest = { version = "0.12", features = ["json"] }
 
 # Open browser
 open = "5.0"
+
+# Database (SQLite with sqlx)
+sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
+
+# Git operations
+git2 = "0.20"
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Password hashing (for auth)
+argon2 = "0.5"
+
+# JWT tokens (for auth)
+jsonwebtoken = "9"
+
+# Random generation (for API keys)
+rand = "0.8"
+
+# Base64 encoding (for API keys)
+base64 = "0.22"
+
+# Directories (for config/data paths)
+dirs = "5.0"
+
+# Hostname detection
+hostname = "0.4"
+urlencoding = "2.1.3"
+
+# Unix signals (for SIGHUP config reload)
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.29", features = ["signal"] }
+
+[dev-dependencies]
+reqwest = "0.12"
+tempfile = "3.10"

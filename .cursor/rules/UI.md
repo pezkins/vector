@@ -530,6 +530,44 @@ pub fn DropZone(
 }
 ```
 
+## CSS Scrolling - CRITICAL Pattern
+
+**Problem**: `h-full` with `overflow-y-auto` often doesn't work because `h-full` requires ALL parent elements to have defined heights.
+
+**Solution**: Use explicit viewport-based heights with `calc()`:
+
+```rust
+// DON'T: Rely on h-full chain (often breaks)
+view! {
+    <div class="h-full overflow-y-auto">
+        // Content that should scroll
+    </div>
+}
+
+// DO: Use explicit calc-based heights
+view! {
+    <div 
+        class="w-full flex flex-col"
+        style="height: calc(100vh - 88px);"  // Subtract header + status bar
+    >
+        // Fixed header
+        <div class="flex-shrink-0 p-4 border-b">
+            "Header"
+        </div>
+        // Scrollable content
+        <div style="flex: 1 1 0%; overflow-y: auto; min-height: 0;">
+            // This will scroll!
+        </div>
+    </div>
+}
+```
+
+**Key CSS properties for scrolling**:
+- `min-height: 0` - Required for flex children to shrink below content size
+- `flex: 1 1 0%` - Grow, shrink, and start at 0 basis
+- `overflow-y: auto` or `overflow-y: scroll` - Enable scrolling
+- `calc(100vh - Xpx)` - Explicit height that doesn't depend on parent chain
+
 ## When Writing Code
 
 1. Keep components small and focused (< 100 lines preferred)
@@ -539,6 +577,7 @@ pub fn DropZone(
 5. Test components in isolation when possible
 6. Prioritize performance - profile before and after significant changes
 7. Always consider mobile/responsive layouts (even if desktop-first)
+8. **For scrollable panels**: Always use explicit `calc()` heights, never rely on `h-full` chain
 
 ## Common Patterns
 

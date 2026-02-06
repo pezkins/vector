@@ -1,0 +1,28 @@
+---
+description: Browser automation constraints to prevent image size errors
+alwaysApply: true
+---
+
+# Browser Automation
+
+When using browser MCP tools (`cursor-ide-browser` or `cursor-browser-extension`):
+
+## Window Size Constraint
+
+**Before taking any screenshots or snapshots**, resize the browser window to stay under the 2000px model limit:
+
+```
+Maximum dimensions: 1600x900 pixels
+```
+
+Use `browser_resize` or equivalent to set the viewport before capturing.
+
+## Why
+
+Model providers reject images exceeding 2000px in any dimension. High-DPI displays capture at 2x resolution, so a 1920px window produces a 3840px image.
+
+## Checklist
+
+- [ ] Resize browser to 1600x900 before screenshots
+- [ ] Verify window size after navigation (some pages resize)
+- [ ] If screenshot fails with "Image Too Large", reduce dimensions further

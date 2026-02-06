@@ -1,0 +1,52 @@
+---
+description: Ensures specialized subagents are invoked for their domain expertise. Always apply when working on this project.
+alwaysApply: true
+---
+
+# Use Subagents for Specialized Work
+
+When working on tasks that fall within a subagent's specialty, **delegate to that subagent** using the Task tool rather than doing the work directly.
+
+## Available Subagents
+
+| Subagent | Use For |
+|----------|---------|
+| `build-runner` | Building, compilation errors, dependency issues, starting/stopping Vectorize |
+| `data-streaming` | WebSocket connections, GraphQL subscriptions, real-time events, Data Preview panel |
+| `ui-builder` | Leptos components, signals, UI styling, drag-and-drop, TailwindCSS |
+| `vector-expert` | Vector GraphQL API, TOML config, component types, pipeline topology |
+
+## When to Delegate
+
+**Always use the appropriate subagent when:**
+- Starting builds or fixing build errors → `build-runner`
+- Working on WebSocket/subscription code → `data-streaming`
+- Creating or modifying UI components → `ui-builder`
+- Working with Vector's API or config format → `vector-expert`
+
+**Do NOT delegate for:**
+- Simple file reads or searches
+- Quick config changes
+- Documentation updates
+
+## How to Invoke
+
+Use the Task tool with the `subagent_type` parameter:
+
+```
+Task tool:
+  subagent_type: "build-runner"
+  prompt: "Build the UI and CLI, then start Vectorize with config/demo.toml"
+```
+
+## Parallel Subagents
+
+When tasks are independent, invoke multiple subagents in parallel:
+- Building UI + Building CLI → two parallel `build-runner` tasks
+- UI changes + API changes → `ui-builder` + `vector-expert` in parallel
+
+## Benefits
+
+- Subagents have specialized context and knowledge
+- Faster task completion with focused expertise
+- Consistent patterns across the codebase

@@ -1,0 +1,153 @@
+version: '3.8'
+
+# Vectorize Multi-Agent Development Environment
+# This setup simulates multiple Vector agents with Vectorize agent sidecars
+# for testing the control plane functionality.
+
+services:
+  # =============================================================================
+  # Production Group - 3 Agents
+  # =============================================================================
+  
+  vector-prod-1:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.agent
+    container_name: vector-prod-1
+    ports:
+      - "8686:8686"              # Vector GraphQL API
+    volumes:
+      - ./configs/production:/etc/vector:rw
+    environment:
+      - VECTOR_API_ENABLED=true
+      - VECTOR_API_ADDRESS=0.0.0.0:8686
+      - VECTOR_LOG=info
+      - VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+      - VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080
+      - VECTORIZE_AGENT_NAME=vector-prod-1
+      - VECTORIZE_GROUP=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8686/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vectorize-net
+
+  vector-prod-2:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.agent
+    container_name: vector-prod-2
+    ports:
+      - "8687:8686"
+    volumes:
+      - ./configs/production:/etc/vector:rw
+    environment:
+      - VECTOR_API_ENABLED=true
+      - VECTOR_API_ADDRESS=0.0.0.0:8686
+      - VECTOR_LOG=info
+      - VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+      - VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080
+      - VECTORIZE_AGENT_NAME=vector-prod-2
+      - VECTORIZE_GROUP=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8686/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vectorize-net
+
+  vector-prod-3:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.agent
+    container_name: vector-prod-3
+    ports:
+      - "8688:8686"
+    volumes:
+      - ./configs/production:/etc/vector:rw
+    environment:
+      - VECTOR_API_ENABLED=true
+      - VECTOR_API_ADDRESS=0.0.0.0:8686
+      - VECTOR_LOG=info
+      - VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+      - VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080
+      - VECTORIZE_AGENT_NAME=vector-prod-3
+      - VECTORIZE_GROUP=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8686/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vectorize-net
+
+  # =============================================================================
+  # Staging Group - 2 Agents
+  # =============================================================================
+  
+  vector-staging-1:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.agent
+    container_name: vector-staging-1
+    ports:
+      - "8689:8686"
+    volumes:
+      - ./configs/staging:/etc/vector:rw
+    environment:
+      - VECTOR_API_ENABLED=true
+      - VECTOR_API_ADDRESS=0.0.0.0:8686
+      - VECTOR_LOG=info
+      - VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+      - VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080
+      - VECTORIZE_AGENT_NAME=vector-staging-1
+      - VECTORIZE_GROUP=staging
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8686/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vectorize-net
+
+  vector-staging-2:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.agent
+    container_name: vector-staging-2
+    ports:
+      - "8690:8686"
+    volumes:
+      - ./configs/staging:/etc/vector:rw
+    environment:
+      - VECTOR_API_ENABLED=true
+      - VECTOR_API_ADDRESS=0.0.0.0:8686
+      - VECTOR_LOG=info
+      - VECTOR_CONFIG_PATH=/etc/vector/vector.toml
+      - VECTORIZE_CONTROL_PLANE=http://host.docker.internal:8080
+      - VECTORIZE_AGENT_NAME=vector-staging-2
+      - VECTORIZE_GROUP=staging
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8686/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vectorize-net
+
+networks:
+  vectorize-net:
+    driver: bridge

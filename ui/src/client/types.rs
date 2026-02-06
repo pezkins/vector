@@ -1,10 +1,12 @@
 //! Client type definitions
 //!
 //! Additional types used by the Vector clients.
+//! These types are prepared for future filter/subscription enhancements.
 
 use serde::{Deserialize, Serialize};
 
-/// Event filter for subscriptions
+/// Event filter for subscriptions (prepared for future use)
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct EventFilter {
     /// Filter by component IDs
@@ -20,6 +22,7 @@ pub struct EventFilter {
     pub limit: Option<usize>,
 }
 
+#[allow(dead_code)]
 impl EventFilter {
     pub fn new() -> Self {
         Self::default()
@@ -46,7 +49,8 @@ impl EventFilter {
     }
 }
 
-/// Subscription options
+/// Subscription options (prepared for future use)
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default)]
 pub struct SubscriptionOptions {
     /// Event filter
@@ -56,6 +60,7 @@ pub struct SubscriptionOptions {
     pub buffer_size: usize,
 }
 
+#[allow(dead_code)]
 impl SubscriptionOptions {
     pub fn new() -> Self {
         Self {

@@ -28,6 +28,7 @@ pub fn Header() -> impl IntoView {
                             view! {
                                 <nav class="flex items-center gap-1 ml-4">
                                     <NavLink href="/pipeline" label="Pipeline" />
+                                    <NavLink href="/groups" label="Groups" />
                                     <NavLink href="/data" label="Data" />
                                     <Show when=move || app_state.connection_mode.get() == vectorize_shared::ConnectionMode::ControlPlane>
                                         <NavLink href="/nodes" label="Nodes" />

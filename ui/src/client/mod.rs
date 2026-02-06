@@ -12,9 +12,13 @@
 //! work identically in both modes.
 
 mod direct;
+mod subscription;
 mod types;
 
 pub use direct::DirectClient;
+pub use subscription::{SubscriptionClient, SubscriptionHandle};
+// Re-export types for external use
+#[allow(unused_imports)]
 pub use types::*;
 
 use async_trait::async_trait;
@@ -48,6 +52,7 @@ pub enum VectorClientError {
 ///
 /// Both DirectClient and ControlPlaneClient implement this trait,
 /// providing a unified interface for the UI.
+#[allow(dead_code)]
 #[async_trait(?Send)]
 pub trait VectorClient {
     /// Check if the connection is healthy

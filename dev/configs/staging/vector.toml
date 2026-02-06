@@ -1,0 +1,40 @@
+# Staging Group Vector Configuration
+# This config generates syslog-formatted demo logs for testing
+
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+playground = true
+
+# =============================================================================
+# Sources
+# =============================================================================
+
+[sources.demo_logs]
+type = "demo_logs"
+format = "syslog"
+interval = 2  # Slower rate for staging
+count = 5000
+
+# =============================================================================
+# Transforms
+# =============================================================================
+
+[transforms.add_metadata]
+type = "remap"
+inputs = ["demo_logs"]
+source = '''
+# Add staging metadata
+.environment = "staging"
+.processed_at = now()
+'''
+
+# =============================================================================
+# Sinks
+# =============================================================================
+
+[sinks.console]
+type = "console"
+inputs = ["add_metadata"]
+encoding.codec = "text"
+target = "stdout"

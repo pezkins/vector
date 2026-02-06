@@ -1,47 +1,74 @@
 [package]
 name = "vectorize-ui"
-version.workspace = true
-edition.workspace = true
+version = "0.1.0"
+edition = "2021"
+
+# Opt out of parent workspace
+[workspace]
 
 [dependencies]
 vectorize-shared = { path = "../shared" }
 
 # Leptos framework
-leptos = { workspace = true }
-leptos_router = { workspace = true }
-leptos_meta = { workspace = true }
+leptos = { version = "0.6", features = ["csr"] }
+leptos_router = { version = "0.6", features = ["csr"] }
+leptos_meta = { version = "0.6", features = ["csr"] }
 
 # Serialization
-serde = { workspace = true }
-serde_json = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
 
 # Time
-chrono = { workspace = true }
+chrono = { version = "0.4", features = ["serde"] }
 
 # IDs
-uuid = { workspace = true }
+uuid = { version = "1.0", features = ["v4", "serde", "js"] }
 
 # WASM bindings
-wasm-bindgen = { workspace = true }
-wasm-bindgen-futures = { workspace = true }
-web-sys = { workspace = true }
-js-sys = { workspace = true }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+    "Window",
+    "Document",
+    "Element",
+    "HtmlElement",
+    "HtmlInputElement",
+    "Event",
+    "EventTarget",
+    "MouseEvent",
+    "DragEvent",
+    "DataTransfer",
+    "DomRect",
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "console",
+    "Location",
+    "Storage",
+    "Navigator",
+    "Clipboard",
+    "Blob",
+    "BlobPropertyBag",
+    "Url",
+] }
+js-sys = "0.3"
 
 # Browser APIs
-gloo-net = { workspace = true }
-gloo-timers = { workspace = true }
-gloo-storage = { workspace = true }
+gloo-net = "0.5"
+gloo-timers = "0.3"
+gloo-storage = "0.3"
 
 # Async
-futures = { workspace = true }
+futures = "0.3"
 
 # Logging
-tracing = { workspace = true }
+tracing = "0.1"
 tracing-wasm = "0.2"
 
 # Error handling  
-thiserror = { workspace = true }
-async-trait = { workspace = true }
+thiserror = "1.0"
+async-trait = "0.1"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

@@ -29,30 +29,29 @@ pub fn StatusBar() -> impl IntoView {
             // Spacer
             <div class="flex-1" />
             
-            // Component count (when connected)
-            <Show when=move || app_state.connected.get()>
-                <div class="flex items-center gap-4">
-                    {move || {
-                        app_state.topology.get().map(|t| {
-                            let sources = t.components.iter()
-                                .filter(|c| c.component_kind == vectorize_shared::ComponentKind::Source)
-                                .count();
-                            let transforms = t.components.iter()
-                                .filter(|c| c.component_kind == vectorize_shared::ComponentKind::Transform)
-                                .count();
-                            let sinks = t.components.iter()
-                                .filter(|c| c.component_kind == vectorize_shared::ComponentKind::Sink)
-                                .count();
-                            
-                            view! {
-                                <span class="text-violet-400">{sources} " sources"</span>
-                                <span class="text-cyan-400">{transforms} " transforms"</span>
-                                <span class="text-orange-400">{sinks} " sinks"</span>
-                            }
-                        })
-                    }}
-                </div>
-            </Show>
+            // UI Pipeline component count
+            <div class="flex items-center gap-4">
+                {move || {
+                    let pipeline = app_state.pipeline.get();
+                    let sources = pipeline.nodes.values()
+                        .filter(|n| matches!(n.node_type, vectorize_shared::NodeType::Source(_)))
+                        .count();
+                    let transforms = pipeline.nodes.values()
+                        .filter(|n| matches!(n.node_type, vectorize_shared::NodeType::Transform(_)))
+                        .count();
+                    let sinks = pipeline.nodes.values()
+                        .filter(|n| matches!(n.node_type, vectorize_shared::NodeType::Sink(_)))
+                        .count();
+                    let connections = pipeline.connections.len();
+                    
+                    view! {
+                        <span class="text-violet-400">{sources} " sources"</span>
+                        <span class="text-cyan-400">{transforms} " transforms"</span>
+                        <span class="text-orange-400">{sinks} " sinks"</span>
+                        <span class="text-slate-400">{connections} " connections"</span>
+                    }
+                }}
+            </div>
             
             // Version info
             <div class="ml-4">

@@ -5,8 +5,84 @@
 
 use std::path::PathBuf;
 use std::process::Stdio;
+use std::sync::Arc;
 use tokio::process::Command;
+use tokio::sync::RwLock;
 use tracing::{info, warn, error};
+
+/// Shared state for the Vector process
+#[derive(Clone)]
+pub struct VectorProcess {
+    inner: Arc<RwLock<VectorProcessInner>>,
+    binary_path: Option<String>,
+}
+
+struct VectorProcessInner {
+    pid: Option<u32>,
+    config_path: Option<PathBuf>,
+}
+
+impl VectorProcess {
+    pub fn new() -> Self {
+        Self {
+            inner: Arc::new(RwLock::new(VectorProcessInner {
+                pid: None,
+                config_path: None,
+            })),
+            binary_path: None,
+        }
+    }
+    
+    /// Create with a specific binary path
+    pub fn with_binary_path(binary_path: PathBuf) -> Self {
+        Self {
+            inner: Arc::new(RwLock::new(VectorProcessInner {
+                pid: None,
+                config_path: None,
+            })),
+            binary_path: Some(binary_path.to_string_lossy().to_string()),
+        }
+    }
+    
+    /// Get the Vector binary path
+    pub fn get_binary_path(&self) -> Option<String> {
+        self.binary_path.clone()
+    }
+    
+    /// Set the Vector process info
+    pub async fn set_process(&self, pid: u32, config_path: Option<PathBuf>) {
+        let mut inner = self.inner.write().await;
+        inner.pid = Some(pid);
+        inner.config_path = config_path;
+    }
+    
+    /// Get the config path
+    pub async fn config_path(&self) -> Option<PathBuf> {
+        self.inner.read().await.config_path.clone()
+    }
+    
+    /// Reload Vector configuration by sending SIGHUP
+    #[cfg(unix)]
+    pub async fn reload_config(&self) -> Result<(), String> {
+        use nix::sys::signal::{kill, Signal};
+        use nix::unistd::Pid;
+        
+        let inner = self.inner.read().await;
+        if let Some(pid) = inner.pid {
+            info!("Sending SIGHUP to Vector (PID: {})", pid);
+            kill(Pid::from_raw(pid as i32), Signal::SIGHUP)
+                .map_err(|e| format!("Failed to send SIGHUP: {}", e))?;
+            Ok(())
+        } else {
+            Err("Vector process not running".to_string())
+        }
+    }
+    
+    #[cfg(not(unix))]
+    pub async fn reload_config(&self) -> Result<(), String> {
+        Err("Config reload via SIGHUP not supported on this platform".to_string())
+    }
+}
 
 /// Find the Vector binary
 fn find_vector_binary(specified: &Option<PathBuf>) -> PathBuf {
@@ -34,16 +110,20 @@ pub async fn start_vector(
     vector_bin: &Option<PathBuf>,
     config: Option<&PathBuf>,
     api_port: u16,
-) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>> {
+    process_state: VectorProcess,
+) -> anyhow::Result<(tokio::task::JoinHandle<anyhow::Result<()>>, PathBuf)> {
     let vector_path = find_vector_binary(vector_bin);
+    let config_path = config.cloned();
+    let vector_path_clone = vector_path.clone();
 
     info!("Starting Vector from: {:?}", vector_path);
 
     let mut cmd = Command::new(&vector_path);
 
-    // Add config if provided
-    if let Some(config_path) = config {
+    // Add config if provided - use -w to watch for config changes
+    if let Some(ref config_path) = config_path {
         cmd.arg("--config").arg(config_path);
+        cmd.arg("-w");  // Watch for config file changes
     }
 
     // Enable API
@@ -58,7 +138,13 @@ pub async fn start_vector(
     let handle = tokio::spawn(async move {
         match cmd.spawn() {
             Ok(mut child) => {
-                info!("Vector started with PID: {:?}", child.id());
+                let pid = child.id();
+                info!("Vector started with PID: {:?}", pid);
+                
+                // Store the PID in shared state
+                if let Some(pid) = pid {
+                    process_state.set_process(pid, config_path).await;
+                }
                 
                 // Wait for Vector to exit
                 match child.wait().await {
@@ -89,7 +175,7 @@ pub async fn start_vector(
         Ok(())
     });
 
-    Ok(handle)
+    Ok((handle, vector_path_clone))
 }
 
 /// Run Vector with passthrough arguments (for `vectorize vector ...` command)

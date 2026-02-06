@@ -1,0 +1,55 @@
+# Production Group Vector Configuration
+# This config generates JSON-formatted demo logs and processes them
+
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+playground = true
+
+# =============================================================================
+# Sources
+# =============================================================================
+
+[sources.demo_logs]
+type = "demo_logs"
+format = "json"
+interval = 1
+count = 10000  # Generate lots of logs for testing
+
+# =============================================================================
+# Transforms
+# =============================================================================
+
+[transforms.parse_json]
+type = "remap"
+inputs = ["demo_logs"]
+source = '''
+# Add production metadata
+.environment = "production"
+.processed_at = now()
+'''
+
+[transforms.filter_errors]
+type = "filter"
+inputs = ["parse_json"]
+condition = '''
+# Only pass through logs with status >= 400 (errors)
+status = to_int(.status) ?? 200
+status >= 400
+'''
+
+# =============================================================================
+# Sinks
+# =============================================================================
+
+[sinks.console_all]
+type = "console"
+inputs = ["parse_json"]
+encoding.codec = "json"
+target = "stdout"
+
+[sinks.console_errors]
+type = "console"
+inputs = ["filter_errors"]
+encoding.codec = "json"
+target = "stderr"

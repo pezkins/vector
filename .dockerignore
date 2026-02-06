@@ -11,5 +11,14 @@
 !scripts
 !vdev
 
+# Vectorize directories
+!vectorize-cli
+!shared
+!ui
+!dev
+!config
+
 # Exclude target directories to avoid copying build artifacts
 target
+ui/target
+# Include ui/dist (pre-built UI assets)
